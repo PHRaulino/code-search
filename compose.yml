@@ -6,7 +6,6 @@ services:
       - "80:80"
       - "8080:8080"
     extra_hosts:
-      - "nome-do-host:endereco-ip-da-sua-maquina-local"
-  meu-servico-resolver:
-    image: alpine
-    command: ash -c "echo 'endereco-ip-da-sua-maquina-local nome-do-host' >> /etc/hosts && sleep 999d"
+      - "nome-do-host:${HOST_IP}"
+
+HOST_IP=$(python -c "import socket; print(socket.gethostbyname('host.docker.internal'))")
