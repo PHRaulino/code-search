@@ -1,0 +1,21 @@
+from fastapi import FastAPI
+from sqlalchemy.orm import Session
+
+from database import engine, Base, SessionLocal
+from crud import crud_router
+
+app = FastAPI()
+
+# cria as tabelas no banco de dados
+Base.metadata.create_all(bind=engine)
+
+# dependência para as rotas acessarem o banco de dados
+def get_db():
+    try:
+        db = SessionLocal()
+        yield db
+    finally:
+        db.close()
+
+# adiciona as rotas de CRUD para cada modelo
+app.include_router(crud_router(models=[Empresa, Fundo], prefix="/crud"))
