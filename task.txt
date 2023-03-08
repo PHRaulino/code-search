@@ -1,0 +1,26 @@
+Objetivo:
+Modificar a lógica de uma lambda proxy para redirecionar para mais de um gateway de destino, configurar o serviço do frontend para enviar os parâmetros corretos e ajustar o MFE chamado POC para ser um exemplo de utilização da solução.
+
+Passos:
+
+Analisar a lambda proxy existente e identificar os pontos onde é necessário fazer modificações para permitir o redirecionamento para mais de um gateway de destino.
+Criar a lógica de redirecionamento para mais de um gateway de destino na lambda proxy.
+Verificar se os parâmetros estão sendo enviados corretamente para os gateways de destino.
+Configurar o serviço do frontend para enviar os parâmetros corretos para a lambda proxy.
+Testar a integração entre o frontend, a lambda proxy e os gateways de destino.
+Documentar as mudanças realizadas na lambda proxy e nos serviços do frontend.
+Ajustar o MFE chamado POC para utilizar a nova solução de redirecionamento para múltiplos gateways.
+Testar o MFE POC com os gateways de destino configurados e documentar as mudanças realizadas no MFE.
+Verificar se o MFE POC está funcionando corretamente com a nova solução de redirecionamento para múltiplos gateways.
+Preparar um guia de utilização da nova solução para orientar os usuários interessados.
+DOD (Definition of Done):
+
+A lambda proxy foi modificada para redirecionar para mais de um gateway de destino.
+A lógica de redirecionamento da lambda proxy foi testada e aprovada.
+O serviço do frontend está configurado para enviar os parâmetros corretos para a lambda proxy.
+A integração entre o frontend, a lambda proxy e os gateways de destino foi testada e aprovada.
+As mudanças realizadas na lambda proxy e nos serviços do frontend foram documentadas.
+O MFE POC foi ajustado para utilizar a nova solução de redirecionamento para múltiplos gateways.
+O MFE POC foi testado e aprovado com os gateways de destino configurados.
+As mudanças realizadas no MFE POC foram documentadas.
+Foi preparado um guia de utilização da nova solução para orientar os usuários interessados.
