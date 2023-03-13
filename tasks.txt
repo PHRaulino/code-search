@@ -1,0 +1,26 @@
+Essa tarefa tem como objetivo configurar o MFE (Micro Frontend) desenvolvido pela equipe de passivos do site para que possa utilizar o serviço do Caronte, que está dentro do shell. Atualmente, o serviço do Caronte funciona com um "@inject" do "GLOBAL_SERVICE" que é feito pelo shell do SI0 existente. A ideia é criar um módulo dentro do MFE que verifique se ele está dentro do shell SI0 ou se está sendo disponibilizado dentro de outro shell. Caso esteja dentro do shell SI0, ele utilizará o serviço disponibilizado no "@inject" do GLOBAL_SERVICE e, caso contrário, deverá utilizar um serviço próprio do MFE.
+
+Definition of Done (DOD):
+
+MFE configurado para utilizar o serviço do Caronte que está dentro do shell;
+Verificação do MFE se está dentro do shell SI0 ou em outro shell;
+Se o MFE estiver dentro do shell SI0, ele deve utilizar o serviço disponibilizado no "@inject" do GLOBAL_SERVICE;
+Se o MFE estiver em outro shell, ele deve utilizar um serviço próprio do MFE;
+Ambos os projetos (MFE e shell) devem estar em Angular;
+Testes realizados para garantir que a integração entre o MFE e o Caronte esteja funcionando corretamente.
+
+--------------------------
+
+Essa tarefa tem como objetivo integrar o MFE (Micro Frontend) desenvolvido pela equipe de passivos do site com o serviço do Caronte, que está disponível dentro do shell. Atualmente, o serviço do Caronte funciona com um "@inject" do "GLOBAL_SERVICE" que é feito pelo shell do SI0 existente. A ideia é criar um módulo dentro do MFE que verifique se ele está sendo executado dentro do shell SI0 ou em outro shell. Caso esteja dentro do shell SI0, ele utilizará o serviço disponibilizado no "@inject" do GLOBAL_SERVICE. Caso contrário, deverá utilizar um serviço próprio do MFE que será disponibilizado para ele.
+
+A verificação do ambiente em que o MFE está sendo executado será feita através de uma API que será exposta pelo shell. O MFE deverá enviar uma requisição para essa API para obter informações sobre o ambiente em que ele está sendo executado. Com base nas informações recebidas, o MFE poderá decidir qual serviço utilizar.
+
+Ambos os projetos (MFE e shell) estão desenvolvidos em Angular. Será necessário configurar o MFE para que ele possa utilizar o serviço do Caronte e desenvolver o serviço próprio do MFE que será utilizado quando o MFE estiver sendo executado em um shell diferente do SI0.
+
+A Definition of Done (DOD) para essa tarefa inclui:
+
+MFE integrado com o serviço do Caronte;
+Módulo de verificação do ambiente desenvolvido e funcionando corretamente;
+Serviço próprio do MFE desenvolvido e funcionando corretamente;
+Configuração completa do MFE para que ele possa utilizar o serviço do Caronte e o serviço próprio, dependendo do ambiente em que está sendo executado;
+Testes realizados para garantir que a integração entre o MFE e o Caronte esteja funcionando corretamente.
