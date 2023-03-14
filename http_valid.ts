@@ -1,25 +1,22 @@
+import { enableProdMode } from '@angular/core';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { AppModule } from './app/app.module';
+import { environment } from './environments/environment';
 import { HttpClient } from '@angular/common/http';
 
-async function checkUrl(httpClient: HttpClient, url: string): Promise<boolean> {
-  try {
-    // Faz uma solicitação HTTP GET para a URL
-    await httpClient.get(url).toPromise();
-    // Se a solicitação for bem-sucedida, retorna verdadeiro
-    return true;
-  } catch {
-    // Se a solicitação falhar, retorna falso
-    return false;
+if (environment.production) {
+  enableProdMode();
+}
+
+// realiza uma solicitação HTTP para verificar se a URL está disponível
+const http = new HttpClient(null);
+http.get('http://exemplo.com').subscribe(
+  response => {
+    console.log('A URL está acessível');
+    platformBrowserDynamic().bootstrapModule(AppModule)
+      .catch(err => console.error(err));
+  },
+  error => {
+    console.log('A URL não está acessível');
   }
-}
-
-async function bootstrap() {
-  const httpClient = new HttpClient();
-  const url = 'https://www.example.com';
-
-  // Verifica se a URL funciona
-  const isUrlWorking = await checkUrl(httpClient, url);
-
-  console.log(`A URL ${url} está funcionando? ${isUrlWorking}`);
-}
-
-bootstrap();
+);
