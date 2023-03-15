@@ -24,3 +24,16 @@ Módulo de verificação do ambiente desenvolvido e funcionando corretamente;
 Serviço próprio do MFE desenvolvido e funcionando corretamente;
 Configuração completa do MFE para que ele possa utilizar o serviço do Caronte e o serviço próprio, dependendo do ambiente em que está sendo executado;
 Testes realizados para garantir que a integração entre o MFE e o Caronte esteja funcionando corretamente.
+
+
+
+
+Analisar o código do MFE e identificar onde será necessário fazer a configuração para utilizar o serviço do Caronte.
+Identificar o uso do post message já existente no MFE e analisar como ele é utilizado em outros shells.
+Implementar um módulo dentro do MFE que verifique se ele está dentro do shell SI0 ou em outro shell.
+Implementar um serviço de HttpAgnoticService para que possa ser utilizado como controlador para identificar qual serviço utilizar.
+Caso o MFE esteja dentro do shell SI0, implementar a lógica para utilizar o "@inject" do GLOBAL_SERVICE.
+Caso o MFE esteja em outro shell, implementar um serviço próprio do MFE que possa ser utilizado para integrar com o Caronte.
+Realizar testes unitários para verificar se o serviço do Caronte está funcionando corretamente no MFE.
+Realizar testes de integração para verificar se a comunicação entre o MFE e o Caronte está ocorrendo corretamente.
+Realizar testes de aceitação para garantir que a funcionalidade atenda aos requisitos do usuário.
