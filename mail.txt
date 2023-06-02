@@ -1,0 +1,31 @@
+Assunto: Solicitação de Acesso ao Google Analytics - Código XXXX
+
+Prezada Equipe de Analytics,
+
+Solicito gentilmente a liberação de acesso ao Google Analytics para uma nova dash que estamos desenvolvendo. É essencial que possamos acompanhar e analisar os dados no Google Analytics para garantir o sucesso de nossas atividades.
+
+Segue abaixo a lista dos usuários que precisam ser adicionados à nova dash, juntamente com suas informações de contato:
+
+Nome: [Nome do Usuário 1]
+E-mail: [E-mail do Usuário 1]
+ID do funcionário: [ID do Usuário 1]
+
+Nome: [Nome do Usuário 2]
+E-mail: [E-mail do Usuário 2]
+ID do funcionário: [ID do Usuário 2]
+
+Nome: [Nome do Usuário 3]
+E-mail: [E-mail do Usuário 3]
+ID do funcionário: [ID do Usuário 3]
+
+Nome: [Nome do Usuário 4]
+E-mail: [E-mail do Usuário 4]
+ID do funcionário: [ID do Usuário 4]
+
+Por favor, concedam acesso adequado ao Google Analytics para que esses usuários possam visualizar e analisar os dados relevantes às suas respectivas áreas de trabalho.
+
+A nova dash foi criada com o código "XXXX". Ao conceder o acesso, peço que utilizem esse código como referência para vincular corretamente os usuários à nova dash.
+
+Agradeço desde já pela sua atenção e apoio. Fico à disposição para qualquer informação adicional.
+
+Atenciosamente,
