@@ -1,56 +1,89 @@
 package main
 
 import (
+    "context"
     "fmt"
-    "github.com/aws/aws-sdk-go/aws"
-    "github.com/aws/aws-sdk-go/aws/session"
-    "github.com/aws/aws-sdk-go/service/cloudwatchlogs"
+    "log"
+    "time"
+
+    "github.com/aws/aws-sdk-go-v2/aws"
+    "github.com/aws/aws-sdk-go-v2/config"
+    "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 )
 
 func main() {
-    // Create a session with the AWS SDK
-    sess, err := session.NewSession(&aws.Config{
-        Region: aws.String("us-west-2"),
-    })
+    // Load the AWS configuration
+    cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("us-west-2"))
     if err != nil {
-        fmt.Println("Error creating session:", err)
-        return
+        log.Fatalf("unable to load SDK config, %v", err)
     }
 
     // Create a CloudWatch Logs client
-    svc := cloudwatchlogs.New(sess)
+    svc := cloudwatchlogs.NewFromConfig(cfg)
 
     // Define the log group name
     logGroupName := "/aws/lambda/LambdaLogin"
 
-    // List log streams
-    logStreamsInput := &cloudwatchlogs.DescribeLogStreamsInput{
-        LogGroupName: aws.String(logGroupName),
-    }
+    // Define the query string
+    queryString := `fields @timestamp, @message
+    | filter @message like /Lambda(Login|Logout|OpendID)/
+    | sort @timestamp desc
+    | limit 20`
 
-    result, err := svc.DescribeLogStreams(logStreamsInput)
+    startTimeStr := "2023-05-01T00:00:00Z"
+    endTimeStr := "2023-05-02T00:00:00Z"
+    layout := time.RFC3339
+    
+    startTime, err := time.Parse(layout, startTimeStr)
     if err != nil {
-        fmt.Println("Error describing log streams:", err)
-        return
+        log.Fatalf("failed to parse start time, %v", err)
+    }
+    
+    endTime, err := time.Parse(layout, endTimeStr)
+    if err != nil {
+        log.Fatalf("failed to parse end time, %v", err)
+    }
+    
+    // Convert to Unix time (in milliseconds)
+    startTimeUnix := startTime.Unix() * 1000
+    endTimeUnix := endTime.Unix() * 1000
+
+    // Start the query
+    startQueryInput := &cloudwatchlogs.StartQueryInput{
+        LogGroupName: aws.String(logGroupName),
+        StartTime:    aws.Int64(startTime),
+        EndTime:      aws.Int64(endTime),
+        QueryString:  aws.String(queryString),
     }
 
-    for _, stream := range result.LogStreams {
-        fmt.Println("Log Stream Name:", *stream.LogStreamName)
+    startQueryOutput, err := svc.StartQuery(context.TODO(), startQueryInput)
+    if err != nil {
+        log.Fatalf("failed to start query, %v", err)
+    }
 
-        // Get log events for each log stream
-        logEventsInput := &cloudwatchlogs.GetLogEventsInput{
-            LogGroupName:  aws.String(logGroupName),
-            LogStreamName: stream.LogStreamName,
+    queryId := startQueryOutput.QueryId
+
+    // Poll for the query results
+    for {
+        getQueryResultsInput := &cloudwatchlogs.GetQueryResultsInput{
+            QueryId: queryId,
         }
 
-        logEvents, err := svc.GetLogEvents(logEventsInput)
+        getQueryResultsOutput, err := svc.GetQueryResults(context.TODO(), getQueryResultsInput)
         if err != nil {
-            fmt.Println("Error getting log events:", err)
-            continue
+            log.Fatalf("failed to get query results, %v", err)
         }
 
-        for _, event := range logEvents.Events {
-            fmt.Println("Log Event:", *event.Message)
+        if *getQueryResultsOutput.Status == "Complete" {
+            for _, result := range getQueryResultsOutput.Results {
+                for _, field := range result {
+                    fmt.Printf("%s: %s\n", aws.ToString(field.Field), aws.ToString(field.Value))
+                }
+            }
+            break
         }
+
+        // Wait for a while before polling again
+        time.Sleep(1 * time.Second)
     }
 }
