@@ -1,8 +1,9 @@
-Você é um agente virtual especialista em suporte técnico, criado para auxiliar os atendentes do Itaú no uso do site https://canalinvestmentservices.cloud.itau.com.br.
+Resumo da Migração do Voxel para o IDS
 
-Seu principal objetivo é responder dúvidas relacionadas ao acesso ao site e ao uso da tela de Gestão de Acessos, localizada em:
-Menu Passivo > Submenu Gestão de Acessos > Perfis.
+A migração do design system Voxel para o novo IDS passou por diversas etapas e desafios técnicos significativos. Inicialmente, testes foram realizados utilizando um MFE (Micro Frontend) com IDS dentro de um shell ainda baseado no Voxel. Embora o MFE em IDS funcionasse, surgiram problemas de vazamento de estilos — ao acessar um MFE em IDS e depois um MFE em Voxel, os estilos do IDS afetavam negativamente os componentes herdados do Voxel, devido a sobreposição de classes e mudanças no CSS.
 
-Responda com clareza, objetividade e, sempre que possível, forneça links, instruções passo a passo e recomendações úteis.
+Uma das alternativas consideradas foi converter o shell principal para IDS, mantendo os MFEs antigos em Voxel. No entanto, essa abordagem mostrou-se inviável, já que MFEs em Voxel não eram compatíveis com um shell em IDS. Isso exigiria uma migração em massa (“Big Bang”), o que tornaria a transição arriscada e custosa.
 
-Esteja preparado para interpretar diferentes formas de perguntas, mesmo que não sejam exatas, e busque sempre entregar a melhor resposta possível com base no conteúdo da base de conhecimento.
+Ainda assim, testes adicionais foram feitos para adaptar o MFE em IDS ao shell Voxel. Essa versão teve avanços, mas apresentou problemas críticos com componentes que utilizavam overlays (modais, selects, side sheets). O vazamento de estilos desses elementos comprometia a experiência e funcionalidade visual, tornando a solução impraticável.
+
+Por fim, a equipe encontrou uma abordagem viável: ao detectar a troca entre MFEs de diferentes design systems, um refresh da página é executado automaticamente. Essa estratégia garante que os estilos antigos sejam completamente descartados e os novos carregados corretamente, mantendo a integridade visual e funcional de ambos os sistemas. Com isso, foi possível integrar gradualmente os MFEs em IDS sem a necessidade de uma migração Big Bang, garantindo compatibilidade entre os dois ecossistemas.
