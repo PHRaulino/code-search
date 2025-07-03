@@ -1,0 +1,129 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/not-first/glance-schema/master/schema.json
+
+server:
+  assets-path: /app/config/assets
+  port: 8080
+  proxied: true
+
+# Config de branding personalizada
+branding:
+  app-name: "PHRSpace"
+  custom-footer: |
+    <p>PH Dashboard</p>
+
+token: ${readFileFromEnv:TOKEN_FILE}
+
+theme:
+  background-color: 50 1 6
+  primary-color: 24 97 58
+  negative-color: 209 88 54
+  contrast-multiplier: 1.1
+  presets:
+    light-mode:
+      light: true
+      background-color: 0 0 95
+      primary-color: 24 97 30
+      negative-color: 0 70 50
+
+pages:
+  - name: Home
+    center-vertically: true
+    columns:
+      - size: small
+        widgets:
+          - type: clock
+            hour-format: 24h
+
+      - size: full
+        widgets:
+          - type: search
+            autofocus: true
+            search-engine: google
+            new-tab: true
+            target: _blank
+            bangs:
+              - title: YouTube
+                shortcut: "!yt"
+                url: https://www.youtube.com/results?search_query={QUERY}
+              - title: GitHub
+                shortcut: "!gh"
+                url: https://github.com/search?q={QUERY}
+              - title: GH PHRSpace Repos
+                shortcut: "!phrs"
+                url: https://github.com/orgs/PHRaulino-Space/repositories?q={QUERY}
+          
+          - type: split-column
+            max-columns: 3
+            widgets:
+              $include: monitors.yml
+          
+      - size: small
+        widgets:
+          - type: bookmarks
+            groups:
+              - title: General
+                links:
+                  - title: Perplexity
+                    url: https://www.perplexity.ai/
+                  - title: ChatGPT
+                    url: https://chatgpt.com/
+                  - title: ChatGPT API Platform
+                    url: https://platform.openai.com/docs/overview/
+                  - title: Repos PHRSpace
+                    url: https://github.com/orgs/PHRaulino-Space/repositories/
+                  - title: Tailscale
+                    url: https://login.tailscale.com/admin/machines/
+
+  - name: Infos
+    columns:
+      - size: small
+        widgets:
+          - type: calendar
+            first-day-of-week: sunday
+          
+          - type: releases
+            cache: 1d
+            repositories:
+              - glanceapp/glance
+              - k3s-io/k3s
+
+      - size: full
+        widgets:
+          - type: rss
+            title: Notícias de Tecnologia (Brasil)
+            style: detailed-list
+            limit: 20
+            collapse-after: 3
+            cache: 6h
+            feeds:
+              - url: https://www.tabnews.com.br/recentes/rss/
+                title: TabNews
+              - url: https://tecnoblog.net/feed/
+                title: Tecnoblog
+              - url: https://canaltech.com.br/rss/
+                title: Canaltech
+              - url: https://www.inovacaotecnologica.com.br/boletim/rss.xml
+                title: Inovacao e Tecnologia
+              - url: https://olhardigital.com.br/feed/
+                title: Olhar Digital
+              - url: https://www.inovacaotecnologica.com.br/boletim/rss.xml
+                title: Inovação Tecnológica
+              - url: https://www.aiacceleratorinstitute.com/rss/
+                title: aiacceleratorinstitute
+
+      - size: small
+        widgets:
+          - type: weather
+            location: Sao Paulo, Brazil
+            units: metric
+            hour-format: 24h
+
+          - type: markets
+            markets:
+              - symbol: BRL=X
+                name: Dólar (USD/BRL)
+              - symbol: BTC-USD
+                name: Bitcoin
+              - symbol: AAPL
+                name: Apple
+         
