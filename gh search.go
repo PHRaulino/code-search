@@ -123,7 +123,10 @@ func getTeamRepositories(ctx context.Context, client *github.Client, orgName, te
 		}
 
 		for _, repo := range repos {
-			allRepos = append(allRepos, *repo.Name)
+			// Filtrar apenas repositórios Python
+			if isPythonRepository(repo) {
+				allRepos = append(allRepos, *repo.Name)
+			}
 		}
 
 		if resp.NextPage == 0 {
@@ -135,36 +138,45 @@ func getTeamRepositories(ctx context.Context, client *github.Client, orgName, te
 	return allRepos, nil
 }
 
+func isPythonRepository(repo *github.Repository) bool {
+	// Verifica pela linguagem principal
+	if repo.Language != nil && strings.ToLower(*repo.Language) == "python" {
+		return true
+	}
+	
+	// Verifica pelo nome do repositório (se contém indicadores Python)
+	if repo.Name != nil {
+		name := strings.ToLower(*repo.Name)
+		if strings.Contains(name, "python") || strings.Contains(name, "py-") || strings.HasSuffix(name, "-py") {
+			return true
+		}
+	}
+	
+	return false
+}
+
 func searchRequirementsInRepo(ctx context.Context, client *github.Client, orgName, repoName string) ([]RequirementsResult, error) {
 	var results []RequirementsResult
 
-	query := fmt.Sprintf("filename:requirements.txt repo:%s/%s", orgName, repoName)
-	
-	searchOpts := &github.SearchOptions{
-		ListOptions: github.ListOptions{PerPage: 100},
+	// Buscar arquivos requirements.txt diretamente no repositório
+	requirementsPaths := []string{
+		"app/requirements.txt",
+		"requirements.txt",
+		"app/requirements/requirements.txt",
+		"app/requirements/base.txt",
+		"app/requirements/production.txt",
 	}
 
-	searchResult, _, err := client.Search.Code(ctx, query, searchOpts)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, codeResult := range searchResult.CodeResults {
-		fileContent, _, _, err := client.Repositories.GetContents(
-			ctx, 
-			orgName, 
-			repoName, 
-			*codeResult.Path, 
-			nil,
-		)
+	for _, path := range requirementsPaths {
+		fileContent, _, _, err := client.Repositories.GetContents(ctx, orgName, repoName, path, nil)
 		if err != nil {
-			fmt.Printf("Error getting content for %s/%s: %v\n", repoName, *codeResult.Path, err)
+			// Arquivo não existe, continuar
 			continue
 		}
 
 		content, err := fileContent.GetContent()
 		if err != nil {
-			fmt.Printf("Error decoding content for %s/%s: %v\n", repoName, *codeResult.Path, err)
+			fmt.Printf("Error decoding content for %s/%s: %v\n", repoName, path, err)
 			continue
 		}
 
@@ -173,7 +185,7 @@ func searchRequirementsInRepo(ctx context.Context, client *github.Client, orgNam
 
 		results = append(results, RequirementsResult{
 			Repository: repoName,
-			FilePath:   *codeResult.Path,
+			FilePath:   path,
 			Content:    content,
 			HasXRay:    hasXRay,
 			HasBoto3:   hasBoto3,
