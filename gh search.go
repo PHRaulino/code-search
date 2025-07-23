@@ -22,11 +22,17 @@ type RequirementsResult struct {
 	HasBoto3   bool
 }
 
+type FileContent struct {
+	Repository string `json:"repository"`
+	FilePath   string `json:"file_path"`
+	Content    string `json:"content"`
+}
+
 type CacheData struct {
-	Repositories []string    `json:"repositories"`
-	Results      []RequirementsResult `json:"results"`
-	Timestamp    time.Time   `json:"timestamp"`
-	TeamSlug     string      `json:"team_slug"`
+	Repositories []string      `json:"repositories"`
+	FileContents []FileContent `json:"file_contents"`
+	Timestamp    time.Time     `json:"timestamp"`
+	TeamSlug     string        `json:"team_slug"`
 }
 
 const CACHE_FILE = "github_cache.json"
@@ -51,12 +57,12 @@ func main() {
 	cachedData := loadCache(teamSlug)
 	
 	var repos []string
-	var results []RequirementsResult
+	var fileContents []FileContent
 	
 	if cachedData != nil && time.Since(cachedData.Timestamp) < CACHE_DURATION {
 		fmt.Println("Using cached data...")
 		repos = cachedData.Repositories
-		results = cachedData.Results
+		fileContents = cachedData.FileContents
 	} else {
 		fmt.Println("Fetching fresh data from GitHub API...")
 		
@@ -69,22 +75,37 @@ func main() {
 
 		fmt.Printf("Found %d repositories for team '%s'\n\n", len(repos), teamSlug)
 
-		// Buscar requirements.txt em cada repositório
+		// Buscar requirements.txt em cada repositório e armazenar apenas o conteúdo
 		for _, repo := range repos {
-			repoResults, err := searchRequirementsInRepo(ctx, client, orgName, repo)
+			repoFileContents, err := getRequirementsFiles(ctx, client, orgName, repo)
 			if err != nil {
 				fmt.Printf("Error searching in %s: %v\n", repo, err)
 				continue
 			}
-			results = append(results, repoResults...)
+			fileContents = append(fileContents, repoFileContents...)
 		}
 
-		// Salvar no cache
+		// Salvar no cache apenas dados da API
 		saveCache(CacheData{
 			Repositories: repos,
-			Results:      results,
+			FileContents: fileContents,
 			Timestamp:    time.Now(),
 			TeamSlug:     teamSlug,
+		})
+	}
+
+	// Aplicar lógica local nos dados do cache
+	var results []RequirementsResult
+	for _, fileContent := range fileContents {
+		hasXRay := strings.Contains(strings.ToLower(fileContent.Content), "aws-sdk-xray")
+		hasBoto3 := strings.Contains(strings.ToLower(fileContent.Content), "boto3")
+
+		results = append(results, RequirementsResult{
+			Repository: fileContent.Repository,
+			FilePath:   fileContent.FilePath,
+			Content:    fileContent.Content,
+			HasXRay:    hasXRay,
+			HasBoto3:   hasBoto3,
 		})
 	}
 
@@ -155,8 +176,8 @@ func isPythonRepository(repo *github.Repository) bool {
 	return false
 }
 
-func searchRequirementsInRepo(ctx context.Context, client *github.Client, orgName, repoName string) ([]RequirementsResult, error) {
-	var results []RequirementsResult
+func getRequirementsFiles(ctx context.Context, client *github.Client, orgName, repoName string) ([]FileContent, error) {
+	var fileContents []FileContent
 
 	// Buscar arquivos requirements.txt diretamente no repositório
 	requirementsPaths := []string{
@@ -180,19 +201,14 @@ func searchRequirementsInRepo(ctx context.Context, client *github.Client, orgNam
 			continue
 		}
 
-		hasXRay := strings.Contains(strings.ToLower(content), "aws-sdk-xray")
-		hasBoto3 := strings.Contains(strings.ToLower(content), "boto3")
-
-		results = append(results, RequirementsResult{
+		fileContents = append(fileContents, FileContent{
 			Repository: repoName,
 			FilePath:   path,
 			Content:    content,
-			HasXRay:    hasXRay,
-			HasBoto3:   hasBoto3,
 		})
 	}
 
-	return results, nil
+	return fileContents, nil
 }
 
 func filterResults(results []RequirementsResult) []RequirementsResult {
