@@ -431,3 +431,36 @@ func main() {
 		fmt.Printf("  %s: %d matches\n", ptype, count)
 	}
 }
+
+
+
+
+
+// convertDoubleStarPattern converte patterns com ** para sintaxe glob
+func convertDoubleStarPattern(pattern string) string {
+	// **/*.go -> {**/,}*.go (qualquer profundidade + raiz)
+	if strings.HasPrefix(pattern, "**/") {
+		suffix := pattern[3:] // Remove "**/"
+		return "{**/,}" + suffix
+	}
+	
+	// *.go/** -> *.go{/**,}
+	if strings.HasSuffix(pattern, "/**") {
+		prefix := pattern[:len(pattern)-3] // Remove "/**"
+		return prefix + "{/**,}"
+	}
+	
+	// dir/**/file -> dir{/**/,/}file
+	if strings.Contains(pattern, "/**/") {
+		return strings.ReplaceAll(pattern, "/**/", "{/**/,/}")
+	}
+	
+	// **pattern** -> {**/,}pattern{/**,}
+	if strings.HasPrefix(pattern, "**") && strings.HasSuffix(pattern, "**") {
+		middle := pattern[2 : len(pattern)-2]
+		return "{**/,}" + middle + "{/**,}"
+	}
+	
+	// Simples ** no meio -> substitui por **
+	return strings.ReplaceAll(pattern, "**", "**")
+}
